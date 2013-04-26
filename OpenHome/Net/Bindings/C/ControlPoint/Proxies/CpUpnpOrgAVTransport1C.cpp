@@ -11,6 +11,7 @@
 #include <OpenHome/Private/Thread.h>
 #include <OpenHome/Net/Private/AsyncPrivate.h>
 #include <OpenHome/Net/Core/CpDevice.h>
+#include <OpenHome/Net/Private/CpiDevice.h>
 
 using namespace OpenHome;
 using namespace OpenHome::Net;
@@ -570,17 +571,30 @@ CpProxyUpnpOrgAVTransport1C::CpProxyUpnpOrgAVTransport1C(CpDeviceC aDevice)
     iActionGetMediaInfo->AddOutputParameter(param);
     param = new OpenHome::Net::ParameterString("RecordMedium");
     iActionGetMediaInfo->AddOutputParameter(param);
-    param = new OpenHome::Net::ParameterString("WriteStatus");
+    index = 0;
+    allowedValues = new TChar*[5];
+    allowedValues[index++] = (TChar*)"WRITABLE";
+    allowedValues[index++] = (TChar*)"PROTECTED";
+    allowedValues[index++] = (TChar*)"NOT_WRITABLE";
+    allowedValues[index++] = (TChar*)"UNKNOWN";
+    allowedValues[index++] = (TChar*)"NOT_IMPLEMENTED";
+    param = new OpenHome::Net::ParameterString("WriteStatus", allowedValues, 5);
     iActionGetMediaInfo->AddOutputParameter(param);
+    delete[] allowedValues;
 
     iActionGetTransportInfo = new Action("GetTransportInfo");
     param = new OpenHome::Net::ParameterUint("InstanceID");
     iActionGetTransportInfo->AddInputParameter(param);
     index = 0;
-    allowedValues = new TChar*[2];
+    allowedValues = new TChar*[7];
     allowedValues[index++] = (TChar*)"STOPPED";
     allowedValues[index++] = (TChar*)"PLAYING";
-    param = new OpenHome::Net::ParameterString("CurrentTransportState", allowedValues, 2);
+    allowedValues[index++] = (TChar*)"TRANSITIONING";
+    allowedValues[index++] = (TChar*)"PAUSED_PLAYBACK";
+    allowedValues[index++] = (TChar*)"PAUSED_RECORDING";
+    allowedValues[index++] = (TChar*)"RECORDING";
+    allowedValues[index++] = (TChar*)"NO_MEDIA_PRESENT";
+    param = new OpenHome::Net::ParameterString("CurrentTransportState", allowedValues, 7);
     iActionGetTransportInfo->AddOutputParameter(param);
     delete[] allowedValues;
     index = 0;
@@ -665,9 +679,16 @@ CpProxyUpnpOrgAVTransport1C::CpProxyUpnpOrgAVTransport1C(CpDeviceC aDevice)
     param = new OpenHome::Net::ParameterUint("InstanceID");
     iActionSeek->AddInputParameter(param);
     index = 0;
-    allowedValues = new TChar*[1];
+    allowedValues = new TChar*[8];
     allowedValues[index++] = (TChar*)"TRACK_NR";
-    param = new OpenHome::Net::ParameterString("Unit", allowedValues, 1);
+    allowedValues[index++] = (TChar*)"ABS_TIME";
+    allowedValues[index++] = (TChar*)"REL_TIME";
+    allowedValues[index++] = (TChar*)"ABS_COUNT";
+    allowedValues[index++] = (TChar*)"REL_COUNT";
+    allowedValues[index++] = (TChar*)"CHANNEL_FREQ";
+    allowedValues[index++] = (TChar*)"TAPE-INDEX";
+    allowedValues[index++] = (TChar*)"FRAME";
+    param = new OpenHome::Net::ParameterString("Unit", allowedValues, 8);
     iActionSeek->AddInputParameter(param);
     delete[] allowedValues;
     param = new OpenHome::Net::ParameterString("Target");
@@ -705,7 +726,7 @@ CpProxyUpnpOrgAVTransport1C::CpProxyUpnpOrgAVTransport1C(CpDeviceC aDevice)
 
     Functor functor;
     functor = MakeFunctor(*this, &CpProxyUpnpOrgAVTransport1C::LastChangePropertyChanged);
-    iLastChange = new PropertyString("LastChange", functor);
+    iLastChange = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "LastChange", functor);
     AddProperty(iLastChange);
 }
 

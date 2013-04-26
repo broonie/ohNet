@@ -20,9 +20,9 @@ class IEventProcessor;
 class CpiDeviceDv : private INonCopyable, private ICpiProtocol, private ICpiDeviceObserver, private IPropertyWriterFactory
 {
 public:
-    CpiDeviceDv(DviDevice& aDevice);
+    CpiDeviceDv(CpStack& aCpStack, DviDevice& aDevice);
+    virtual ~CpiDeviceDv();
     CpiDevice& Device();
-    virtual ~CpiDeviceDv() {}
 private: // ICpiProtocol
     void InvokeAction(Invocation& aInvocation);
     TBool GetAttribute(const char* aKey, Brh& aValue) const;
@@ -44,6 +44,8 @@ private:
     CpiSubscription* iSubscriptionCp;
     typedef std::map<Brn,Brn,BufferCmp> SubscriptionMap;
     SubscriptionMap iSubscriptions;
+    Mutex iLock;
+    Semaphore iShutdownSem;
 };
 
 class Argument;
@@ -59,6 +61,7 @@ private: // IDviInvocation
     TUint Version() const;
     TIpAddress Adapter() const;
     const char* ResourceUriPrefix() const;
+    Endpoint ClientEndpoint() const;
 
     void InvocationReadStart();
     TBool InvocationReadBool(const TChar* aName);

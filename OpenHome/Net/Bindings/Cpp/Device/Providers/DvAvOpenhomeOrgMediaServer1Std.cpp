@@ -4,6 +4,7 @@
 #include <OpenHome/Net/Private/Service.h>
 #include <OpenHome/Net/Private/FunctorDviInvocation.h>
 #include <OpenHome/Net/Cpp/DvInvocation.h>
+#include <OpenHome/Net/Private/DviStack.h>
 
 using namespace OpenHome;
 using namespace OpenHome::Net;
@@ -249,97 +250,97 @@ DvProviderAvOpenhomeOrgMediaServer1Cpp::DvProviderAvOpenhomeOrgMediaServer1Cpp(D
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyManufacturerName()
 {
-    iPropertyManufacturerName = new PropertyString(new ParameterString("ManufacturerName"));
+    iPropertyManufacturerName = new PropertyString(iDvStack.Env(), new ParameterString("ManufacturerName"));
     iService->AddProperty(iPropertyManufacturerName); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyManufacturerInfo()
 {
-    iPropertyManufacturerInfo = new PropertyString(new ParameterString("ManufacturerInfo"));
+    iPropertyManufacturerInfo = new PropertyString(iDvStack.Env(), new ParameterString("ManufacturerInfo"));
     iService->AddProperty(iPropertyManufacturerInfo); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyManufacturerUrl()
 {
-    iPropertyManufacturerUrl = new PropertyString(new ParameterString("ManufacturerUrl"));
+    iPropertyManufacturerUrl = new PropertyString(iDvStack.Env(), new ParameterString("ManufacturerUrl"));
     iService->AddProperty(iPropertyManufacturerUrl); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyManufacturerImageUri()
 {
-    iPropertyManufacturerImageUri = new PropertyString(new ParameterString("ManufacturerImageUri"));
+    iPropertyManufacturerImageUri = new PropertyString(iDvStack.Env(), new ParameterString("ManufacturerImageUri"));
     iService->AddProperty(iPropertyManufacturerImageUri); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyModelName()
 {
-    iPropertyModelName = new PropertyString(new ParameterString("ModelName"));
+    iPropertyModelName = new PropertyString(iDvStack.Env(), new ParameterString("ModelName"));
     iService->AddProperty(iPropertyModelName); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyModelInfo()
 {
-    iPropertyModelInfo = new PropertyString(new ParameterString("ModelInfo"));
+    iPropertyModelInfo = new PropertyString(iDvStack.Env(), new ParameterString("ModelInfo"));
     iService->AddProperty(iPropertyModelInfo); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyModelUrl()
 {
-    iPropertyModelUrl = new PropertyString(new ParameterString("ModelUrl"));
+    iPropertyModelUrl = new PropertyString(iDvStack.Env(), new ParameterString("ModelUrl"));
     iService->AddProperty(iPropertyModelUrl); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyModelImageUri()
 {
-    iPropertyModelImageUri = new PropertyString(new ParameterString("ModelImageUri"));
+    iPropertyModelImageUri = new PropertyString(iDvStack.Env(), new ParameterString("ModelImageUri"));
     iService->AddProperty(iPropertyModelImageUri); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyProductName()
 {
-    iPropertyProductName = new PropertyString(new ParameterString("ProductName"));
+    iPropertyProductName = new PropertyString(iDvStack.Env(), new ParameterString("ProductName"));
     iService->AddProperty(iPropertyProductName); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyProductInfo()
 {
-    iPropertyProductInfo = new PropertyString(new ParameterString("ProductInfo"));
+    iPropertyProductInfo = new PropertyString(iDvStack.Env(), new ParameterString("ProductInfo"));
     iService->AddProperty(iPropertyProductInfo); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyProductUrl()
 {
-    iPropertyProductUrl = new PropertyString(new ParameterString("ProductUrl"));
+    iPropertyProductUrl = new PropertyString(iDvStack.Env(), new ParameterString("ProductUrl"));
     iService->AddProperty(iPropertyProductUrl); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyProductImageUri()
 {
-    iPropertyProductImageUri = new PropertyString(new ParameterString("ProductImageUri"));
+    iPropertyProductImageUri = new PropertyString(iDvStack.Env(), new ParameterString("ProductImageUri"));
     iService->AddProperty(iPropertyProductImageUri); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyAttributes()
 {
-    iPropertyAttributes = new PropertyString(new ParameterString("Attributes"));
+    iPropertyAttributes = new PropertyString(iDvStack.Env(), new ParameterString("Attributes"));
     iService->AddProperty(iPropertyAttributes); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyQueryPort()
 {
-    iPropertyQueryPort = new PropertyUint(new ParameterUint("QueryPort"));
+    iPropertyQueryPort = new PropertyUint(iDvStack.Env(), new ParameterUint("QueryPort"));
     iService->AddProperty(iPropertyQueryPort); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyBrowsePort()
 {
-    iPropertyBrowsePort = new PropertyUint(new ParameterUint("BrowsePort"));
+    iPropertyBrowsePort = new PropertyUint(iDvStack.Env(), new ParameterUint("BrowsePort"));
     iService->AddProperty(iPropertyBrowsePort); // passes ownership
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnablePropertyUpdateCount()
 {
-    iPropertyUpdateCount = new PropertyUint(new ParameterUint("UpdateCount"));
+    iPropertyUpdateCount = new PropertyUint(iDvStack.Env(), new ParameterUint("UpdateCount"));
     iService->AddProperty(iPropertyUpdateCount); // passes ownership
 }
 
@@ -405,15 +406,6 @@ void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnableActionUpdateCount()
     OpenHome::Net::Action* action = new OpenHome::Net::Action("UpdateCount");
     action->AddOutputParameter(new ParameterRelated("Value", *iPropertyUpdateCount));
     FunctorDviInvocation functor = MakeFunctorDviInvocation(*this, &DvProviderAvOpenhomeOrgMediaServer1Cpp::DoUpdateCount);
-    iService->AddAction(action, functor);
-}
-
-void DvProviderAvOpenhomeOrgMediaServer1Cpp::EnableActionQuery()
-{
-    OpenHome::Net::Action* action = new OpenHome::Net::Action("Query");
-    action->AddInputParameter(new ParameterString("Request"));
-    action->AddOutputParameter(new ParameterString("Result"));
-    FunctorDviInvocation functor = MakeFunctorDviInvocation(*this, &DvProviderAvOpenhomeOrgMediaServer1Cpp::DoQuery);
     iService->AddAction(action, functor);
 }
 
@@ -561,24 +553,6 @@ void DvProviderAvOpenhomeOrgMediaServer1Cpp::DoUpdateCount(IDviInvocation& aInvo
     aInvocation.InvocationWriteEnd();
 }
 
-void DvProviderAvOpenhomeOrgMediaServer1Cpp::DoQuery(IDviInvocation& aInvocation)
-{
-    aInvocation.InvocationReadStart();
-    Brhz buf_Request;
-    aInvocation.InvocationReadString("Request", buf_Request);
-    std::string Request((const char*)buf_Request.Ptr(), buf_Request.Bytes());
-    aInvocation.InvocationReadEnd();
-    std::string respResult;
-    DvInvocationStd invocation(aInvocation);
-    Query(invocation, Request, respResult);
-    aInvocation.InvocationWriteStart();
-    DviInvocationResponseString respWriterResult(aInvocation, "Result");
-    Brn buf_Result((const TByte*)respResult.c_str(), (TUint)respResult.length());
-    respWriterResult.Write(buf_Result);
-    aInvocation.InvocationWriteStringEnd("Result");
-    aInvocation.InvocationWriteEnd();
-}
-
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::Manufacturer(IDvInvocationStd& /*aInvocation*/, std::string& /*aName*/, std::string& /*aInfo*/, std::string& /*aUrl*/, std::string& /*aImageUri*/)
 {
     ASSERTS();
@@ -610,11 +584,6 @@ void DvProviderAvOpenhomeOrgMediaServer1Cpp::BrowsePort(IDvInvocationStd& /*aInv
 }
 
 void DvProviderAvOpenhomeOrgMediaServer1Cpp::UpdateCount(IDvInvocationStd& /*aInvocation*/, uint32_t& /*aValue*/)
-{
-    ASSERTS();
-}
-
-void DvProviderAvOpenhomeOrgMediaServer1Cpp::Query(IDvInvocationStd& /*aInvocation*/, const std::string& /*aRequest*/, std::string& /*aResult*/)
 {
     ASSERTS();
 }

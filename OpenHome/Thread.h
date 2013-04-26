@@ -8,7 +8,6 @@
 
 EXCEPTION(ThreadKill);
 EXCEPTION(Timeout);
-EXCEPTION(ThreadUnknown);
 
 namespace OpenHome {
 
@@ -132,6 +131,12 @@ public:
     static TBool SupportsPriorities();
 
     /**
+     * If current thread is an OpenHome thread, and Kill() has been called, then
+     * throw ThreadKill.
+     */
+    static void CheckCurrentForKill();
+
+    /**
      * Mark a thread as to be killed.  The thread will not exit immediately
      */
     void Kill();
@@ -175,6 +180,7 @@ private:
     TBool     iKill;
     TUint     iStackBytes;
     TUint     iPriority;
+    mutable Mutex iKillMutex;
 };
 
 /**

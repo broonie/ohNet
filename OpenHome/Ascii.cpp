@@ -1,6 +1,7 @@
 #include <OpenHome/Private/Ascii.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <string.h>
 
 using namespace OpenHome;
 
@@ -88,25 +89,6 @@ TBool Ascii::CaseInsensitiveEquals(const Brx& aBuffer1, const Brx& aBuffer2)
         }
     }
     return (true);
-}
-
-TBool Ascii::RemoveTheFromStart(const Brx& aSrc, Bwx& aDst)
-{
-    if (aSrc.Bytes() <= 4)
-    {
-        aDst.Replace(aSrc);
-        return (false);
-    }
-    else if (CaseInsensitiveEquals(aSrc.Split(0,4), Brn("The "))) 
-    {
-        aDst.Replace(aSrc.Split(4, (aSrc.Bytes() - 4)));
-        return (true);
-    }
-    else
-    {
-        aDst.Replace(aSrc);
-        return (false);
-    }
 }
 
 /// Return the hex character coresponding to the value passed in.
@@ -351,6 +333,17 @@ TBool Ascii::Contains(const Brx& aBuffer, TChar aValue)
         }
     }
     return (false);
+}
+
+TBool Ascii::Contains(const Brx& aBuffer, const Brx& aValue)
+{
+	TInt bytes = aBuffer.Bytes() - aValue.Bytes();
+    for (TInt i=0; i<=bytes; i++) {
+        if (strncmp((char*)&aBuffer[i], (char*)&aValue[0], aValue.Bytes()) == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 TBool Ascii::ContainsWhitespace(const Brx& aBuffer)

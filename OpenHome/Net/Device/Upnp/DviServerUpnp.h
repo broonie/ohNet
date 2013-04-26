@@ -86,9 +86,10 @@ private:
 class SubscriptionDataUpnp : public IDviSubscriptionUserData
 {
 public:
-    SubscriptionDataUpnp(const Endpoint& aSubscriber, const Brx& aSubscriberPath);
+    SubscriptionDataUpnp(const Endpoint& aSubscriber, const Brx& aSubscriberPath, const Http::EVersion aHttpVersion);
     const Endpoint& Subscriber() const;
     const Brx& SubscriberPath() const;
+    const Http::EVersion HttpVersion() const;
     virtual const void* Data() const;
     virtual void Release();
 private:
@@ -96,12 +97,14 @@ private:
 private:
     Endpoint iSubscriber;
     Brh iSubscriberPath;
+    Http::EVersion iHttpVersion;
 };
 
 class PropertyWriterUpnp : public PropertyWriter
 {
 public:
-    PropertyWriterUpnp(const Endpoint& aPublisher, const Endpoint& aSubscriber, const Brx& aSubscriberPath, const Brx& aSid, TUint aSequenceNumber);
+    PropertyWriterUpnp(DvStack& aDvStack, const Endpoint& aPublisher, const Endpoint& aSubscriber,
+                       const Brx& aSubscriberPath, const Http::EVersion aHttpVersion, const Brx& aSid, TUint aSequenceNumber);
 private: // IPropertyWriter
     ~PropertyWriterUpnp();
     void PropertyWriteEnd();
@@ -109,16 +112,19 @@ private:
     static const TUint kMaxRequestBytes = 12*1024;
     static const TUint kMaxResponseBytes = 128;
     static const TUint kReadTimeoutMs = 5 * 1000;
+    DvStack& iDvStack;
     SocketTcpClient iSocket;
     Sws<kMaxRequestBytes>* iWriteBuffer;
     WriterHttpRequest* iWriterEvent;
     WriterHttpChunked* iWriterChunked;
 };
 
+class DvStack;
+
 class PropertyWriterFactory : public IPropertyWriterFactory
 {
 public:
-    PropertyWriterFactory(TIpAddress aAdapter, TUint aPort);
+    PropertyWriterFactory(DvStack& aDvStack, TIpAddress aAdapter, TUint aPort);
     void SubscriptionAdded(DviSubscription& aSubscription);
     void Disable();
 private: // IPropertyWriterFactory
@@ -132,6 +138,7 @@ private:
     void RemoveRef();
 private:
     TUint iRefCount;
+    DvStack& iDvStack;
     TBool iEnabled;
     TIpAddress iAdapter;
     TUint iPort;
@@ -144,7 +151,7 @@ private:
 class DviSessionUpnp : public SocketTcpSession, private IResourceWriter, private IDviInvocation
 {
 public:
-    DviSessionUpnp(TIpAddress aInterface, TUint aPort, IRedirector& aRedirector);
+    DviSessionUpnp(DvStack& aDvStack, TIpAddress aInterface, TUint aPort, IRedirector& aRedirector);
     ~DviSessionUpnp();
 private:
     void Run();
@@ -166,6 +173,7 @@ private: // IDviInvocation
     TUint Version() const;
     TIpAddress Adapter() const;
     const char* ResourceUriPrefix() const;
+    Endpoint ClientEndpoint() const;
     void InvocationReadStart();
     TBool InvocationReadBool(const TChar* aName);
     void InvocationReadString(const TChar* aName, Brhz& aString);
@@ -192,6 +200,7 @@ private:
     static const TUint kMaxResponseBytes = 4*1024;
     static const TUint kReadTimeoutMs = 5 * 1000;
 private:
+    DvStack& iDvStack;
     TIpAddress iInterface;
     TUint iPort;
     IRedirector& iRedirector;
@@ -222,10 +231,11 @@ private:
     Semaphore iShutdownSem;
 };
 
+
 class DviServerUpnp : public DviServer, private IRedirector
 {
 public:
-    DviServerUpnp(TUint aPort = 0);
+    DviServerUpnp(DvStack& aDvStack, TUint aPort = 0);
     void Redirect(const Brx& aUriRequested, const Brx& aUriRedirectedTo);
 protected:
     virtual SocketTcpServer* CreateServer(const NetworkAdapter& aNif);

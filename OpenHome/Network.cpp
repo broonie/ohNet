@@ -4,7 +4,7 @@
 #include <OpenHome/Private/Debug.h>
 #include <OpenHome/Functor.h>
 #include <OpenHome/Private/Stream.h>
-#include <OpenHome/Net/Private/Stack.h>
+#include <OpenHome/Private/Env.h>
 #include <OpenHome/Private/Ascii.h>
 
 #include <errno.h>
@@ -13,10 +13,10 @@ using namespace OpenHome;
 
 // OS sockets interface
 
-static THandle SocketCreate(ESocketType aSocketType)
+static THandle SocketCreate(Environment& aEnv, ESocketType aSocketType)
 {
     LOGF(kNetwork, "SocketCreate  ST = %d, \n", aSocketType);
-    THandle handle = OpenHome::Os::NetworkCreate(aSocketType);
+    THandle handle = OpenHome::Os::NetworkCreate(aEnv.OsCtx(), aSocketType);
     LOGF(kNetwork, "SocketCreate  Socket H = %d\n", handle);
     return handle;
 }
@@ -159,6 +159,7 @@ TBool Endpoint::Equals(const Endpoint& aEndpoint) const
 // Socket
 
 Socket::Socket()
+    : iLogLock("SKLL")
 {
     iHandle = kHandleNull;
     iLog = kLogNone;
@@ -338,10 +339,10 @@ void Socket::Listen(TUint aSlots)
     }
 }
 
-THandle Socket::Accept()
+THandle Socket::Accept(Endpoint& aClientEndpoint)
 {
     LOGF(kNetwork, "Socket::Accept H = %d\n", iHandle);
-    THandle handle = OpenHome::Os::NetworkAccept(iHandle);
+    THandle handle = OpenHome::Os::NetworkAccept(iHandle, aClientEndpoint);
     LOGF(kNetwork,"Socket::Accept Accepted Handle = %d\n", handle);
     if(handle == kHandleNull) {
         LOG2F(kNetwork, kError, "Socket::Accept H = %d\n", handle);
@@ -350,12 +351,12 @@ THandle Socket::Accept()
     return handle;
 }
 
-void Socket::Log(const char* aPrefix, const Brx& aBuffer)
+void Socket::Log(const char* aPrefix, const Brx& aBuffer) const
 {
     if (iLog == kLogNone) {
         return;
     }
-    AutoMutex a(Net::Stack::Mutex());
+    AutoMutex a(iLogLock);
     if (iLog == kLogPlainText) {
         Log::Print("%s", aPrefix);
         TUint bytes = aBuffer.Bytes();
@@ -490,10 +491,10 @@ static void TryNetworkTcpSetNoDelay(THandle aHandle)
 
 // Tcp client
 
-void SocketTcpClient::Open()
+void SocketTcpClient::Open(Environment& aEnv)
 {
     LOGF(kNetwork, "SocketTcpClient::Open\n");
-    iHandle = SocketCreate(eSocketTypeStream);
+    iHandle = SocketCreate(aEnv, eSocketTypeStream);
     TryNetworkTcpSetNoDelay(iHandle);
 }
 
@@ -505,7 +506,7 @@ void SocketTcpClient::Connect(const Endpoint& aEndpoint, TUint aTimeout)
 
 // Tcp Server
 
-SocketTcpServer::SocketTcpServer(const TChar* aName, TUint aPort, TIpAddress aInterface,
+SocketTcpServer::SocketTcpServer(Environment& aEnv, const TChar* aName, TUint aPort, TIpAddress aInterface,
                                  TUint aSessionPriority, TUint aSessionStackBytes, TUint aSlots)
     : iMutex(aName)
     , iSessionPriority(aSessionPriority)
@@ -513,7 +514,7 @@ SocketTcpServer::SocketTcpServer(const TChar* aName, TUint aPort, TIpAddress aIn
     , iTerminating(false)
 {
     LOGF(kNetwork, "SocketTcpServer::SocketTcpServer\n");
-    iHandle = SocketCreate(eSocketTypeStream);
+    iHandle = SocketCreate(aEnv, eSocketTypeStream);
     OpenHome::Os::NetworkSocketSetReuseAddress(iHandle);
     TryNetworkTcpSetNoDelay(iHandle);
     iInterface = aInterface;
@@ -537,7 +538,7 @@ void SocketTcpServer::Add(const TChar* aName, SocketTcpSession* aSession, TInt a
     }
 }
 
-THandle SocketTcpServer::Accept()
+THandle SocketTcpServer::Accept(Endpoint& aClientEndpoint)
 {
     LOGF(kNetwork, "SocketTcpServer::Accept\n");
     iMutex.Wait();                                    // wait to become the single accepting thread
@@ -548,7 +549,7 @@ THandle SocketTcpServer::Accept()
 
     THandle handle;
     try {
-        handle = Socket::Accept();    // accept the connection
+        handle = Socket::Accept(aClientEndpoint);    // accept the connection
         iMutex.Signal();
         return (handle);
     }
@@ -602,7 +603,7 @@ void SocketTcpSession::Start()
     LOGF(kNetwork, ">SocketTcpSession::Start()\n");
     for (;;) {
         try {
-            Open(iServer->Accept());            // accept a connection for this session
+            Open(iServer->Accept(iClientEndpoint));            // accept a connection for this session
         } catch (NetworkError&) {                // server is being destroyed
             LOG2F(kNetwork, kError, "-SocketTcpSession::Start() Network Accept Exception\n");
             break;
@@ -639,6 +640,11 @@ void SocketTcpSession::Open(THandle aHandle)
     iMutex.Signal();
 }
 
+Endpoint SocketTcpSession::ClientEndpoint() const
+{
+    return iClientEndpoint;
+}
+
 void SocketTcpSession::Close()
 {
     LOGF(kNetwork, "SocketTcpSession::Close %d\n", iHandle);
@@ -670,10 +676,10 @@ SocketTcpSession::~SocketTcpSession()
 
 // SocketUdpBase
 
-SocketUdpBase::SocketUdpBase()
+SocketUdpBase::SocketUdpBase(Environment& aEnv)
 {
     LOGF(kNetwork, "> SocketUdpBase::SocketUdpBase\n");
-    iHandle = SocketCreate(eSocketTypeDatagram);
+    iHandle = SocketCreate(aEnv, eSocketTypeDatagram);
     OpenHome::Os::NetworkSocketSetReuseAddress(iHandle);
     LOGF(kNetwork, "< SocketUdpBase::SocketUdpBase H = %d\n", iHandle);
 }
@@ -713,21 +719,24 @@ Endpoint SocketUdpBase::Receive(Bwx& aBuffer)
 
 // SocketUdp
 
-SocketUdp::SocketUdp()
+SocketUdp::SocketUdp(Environment& aEnv)
+    : SocketUdpBase(aEnv)
 {
     LOGF(kNetwork, "> SocketUdp::SocketUdp\n");
     Bind(0, 0);
     LOGF(kNetwork, "< SocketUdp::SocketUdp H = %d, P = %d\n", iHandle, iPort);
 }
 
-SocketUdp::SocketUdp(TUint aPort)
+SocketUdp::SocketUdp(Environment& aEnv, TUint aPort)
+    : SocketUdpBase(aEnv)
 {
     LOGF(kNetwork, "> SocketUdp::SocketUdp P = %d\n", aPort);
     Bind(aPort, 0);
     LOGF(kNetwork, "< SocketUdp::SocketUdp H = %d, P = %d\n", iHandle, iPort);
 }
 
-SocketUdp::SocketUdp(TUint aPort, TIpAddress aInterface)
+SocketUdp::SocketUdp(Environment& aEnv, TUint aPort, TIpAddress aInterface)
+    : SocketUdpBase(aEnv)
 {
     LOGF(kNetwork, "> SocketUdp::SocketUdp P = %d, I = %x\n", aPort, aInterface);
     Bind(aPort, aInterface);
@@ -743,8 +752,9 @@ void SocketUdp::Bind(TUint aPort, TIpAddress aInterface)
 
 // SocketUdpMulticast
 
-SocketUdpMulticast::SocketUdpMulticast(TIpAddress aInterface, const Endpoint& aEndpoint)
-    : iInterface(aInterface)
+SocketUdpMulticast::SocketUdpMulticast(Environment& aEnv, TIpAddress aInterface, const Endpoint& aEndpoint)
+    : SocketUdpBase(aEnv)
+    , iInterface(aInterface)
     , iAddress(aEndpoint.Address())
 {
     LOGF(kNetwork, "> SocketUdpMulticast::SocketUdpMulticast I = %x, E = %x:%d\n", iInterface, iAddress, iPort);

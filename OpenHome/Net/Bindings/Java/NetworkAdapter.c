@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <stdlib.h>
+#include <OpenHome/Os.h>
 #include "NetworkAdapter.h"
 #include "OpenHome/Net/C/OhNet.h"
 
@@ -22,7 +23,13 @@ JNIEXPORT jint JNICALL Java_org_openhome_net_core_NetworkAdapter_OhNetNetworkAda
 
 	ipAddr = OhNetNetworkAdapterAddress(adapter);
 	
-	return (jint) ipAddr;
+#ifdef DEFINE_LITTLE_ENDIAN
+    return (jint) SwapEndian32(ipAddr);
+#elif defined DEFINE_BIG_ENDIAN
+    return (jint) ipAddr;
+#else
+# error Endianness not defined
+#endif
 }
 
 /*
@@ -40,7 +47,37 @@ JNIEXPORT jint JNICALL Java_org_openhome_net_core_NetworkAdapter_OhNetNetworkAda
 
 	ipAddr = OhNetNetworkAdapterSubnet(adapter);
 	
+#ifdef DEFINE_LITTLE_ENDIAN
+    return (jint) SwapEndian32(ipAddr);
+#elif defined DEFINE_BIG_ENDIAN
 	return (jint) ipAddr;
+#else
+# error Endianness not defined
+#endif
+}
+
+/*
+ * Class:     org_openhome_net_core_NetworkAdapter
+ * Method:    OhNetNetworkAdapterMask
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_org_openhome_net_core_NetworkAdapter_OhNetNetworkAdapterMask
+  (JNIEnv *aEnv, jclass aClass, jlong aNif)
+{
+	TIpAddress ipAddr;
+	OhNetHandleNetworkAdapter adapter = (OhNetHandleNetworkAdapter) (size_t)aNif;
+	aEnv = aEnv;
+	aClass = aClass;
+
+	ipAddr = OhNetNetworkAdapterMask(adapter);
+	
+#ifdef DEFINE_LITTLE_ENDIAN
+    return (jint) SwapEndian32(ipAddr);
+#elif defined DEFINE_BIG_ENDIAN
+	return (jint) ipAddr;
+#else
+# error Endianness not defined
+#endif
 }
 
 /*
@@ -55,7 +92,7 @@ JNIEXPORT jstring JNICALL Java_org_openhome_net_core_NetworkAdapter_OhNetNetwork
 	const char* name = OhNetNetworkAdapterName(adapter);
 	aClass = aClass;
 	
-	return ((*aEnv)->NewStringUTF(aEnv, name));
+    return ((*aEnv)->NewStringUTF(aEnv, name));
 }
 
 /*

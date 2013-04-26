@@ -28,6 +28,7 @@ public:
     virtual TUint Version() const = 0;
     virtual TIpAddress Adapter() const = 0;
     virtual const char* ResourceUriPrefix() const = 0;
+    virtual Endpoint ClientEndpoint() const = 0;
 
     virtual void InvocationReadStart() = 0;
     virtual TBool InvocationReadBool(const TChar* aName) = 0;
@@ -69,10 +70,12 @@ private:
 };
 
 class DviDevice;
+class DvStack;
+
 class DviService : public Service, private IStackObject
 {
 public:
-    DviService(const TChar* aDomain, const TChar* aName, TUint aVersion);
+    DviService(DvStack& aDvStack, const TChar* aDomain, const TChar* aName, TUint aVersion);
     void AddRef();
     void RemoveRef();
     void StopSubscriptions();
@@ -99,6 +102,7 @@ private:
 private: // from IStackObject
     void ListObjectDetails() const;
 private:
+    DvStack& iDvStack;
     Mutex iLock;
     TUint iRefCount;
     Mutex iPropertiesLock;
@@ -120,6 +124,7 @@ public:
     virtual void EndResponse();
     virtual TIpAddress Adapter() const;
     virtual const char* ResourceUriPrefix() const;
+    virtual Endpoint ClientEndpoint() const;
 private:
     IDviInvocation& iInvocation;
 };

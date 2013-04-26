@@ -9,6 +9,7 @@
 #include <OpenHome/Private/Timer.h>
 #include <OpenHome/Private/Thread.h>
 #include <OpenHome/Private/Fifo.h>
+#include <OpenHome/Net/Core/OhNet.h>
 
 #include <vector>
 #include <map>
@@ -40,10 +41,12 @@ public:
 
 class DviDevice;
 class DviService;
-class DviSubscription
+class DvStack;
+
+class DviSubscription : private IStackObject
 {
 public:
-    DviSubscription(DviDevice& aDevice, IPropertyWriterFactory& aWriterFactory,
+    DviSubscription(DvStack& aDvStack, DviDevice& aDevice, IPropertyWriterFactory& aWriterFactory,
                     IDviSubscriptionUserData* aUserData, Brh& aSid, TUint& aDurationSecs);
     void Start(DviService& aService);
     void Stop(); // should only be called by DviService
@@ -55,12 +58,15 @@ public:
     void WriteChanges();
     const Brx& Sid() const;
     TBool PropertiesInitialised() const;
+private: // from IStackObject
+    void ListObjectDetails() const;
 private:
-    ~DviSubscription();
+    virtual ~DviSubscription();
     IPropertyWriter* CreateWriter();
     void Expired();
     void DoRenew(TUint& aSeconds);
 private:
+    DvStack& iDvStack;
     mutable Mutex iLock;
     TUint iRefCount;
     DviDevice& iDevice;
@@ -109,16 +115,16 @@ private:
 class DviSubscriptionManager : public Thread
 {
 public:
-    DviSubscriptionManager();
+    DviSubscriptionManager(DvStack& aDvStack);
     ~DviSubscriptionManager();
-    static void AddSubscription(DviSubscription& aSubscription);
-    static void RemoveSubscription(DviSubscription& aSubscription);
-    static DviSubscription* Find(const Brx& aSid);
-    static void QueueUpdate(DviSubscription& aSubscription);
+    void AddSubscription(DviSubscription& aSubscription);
+    void RemoveSubscription(DviSubscription& aSubscription);
+    DviSubscription* Find(const Brx& aSid);
+    void QueueUpdate(DviSubscription& aSubscription);
 private:
-    static DviSubscriptionManager& Self();
     void Run();
 private:
+    DvStack& iDvStack;
     Mutex iLock;
     std::list<DviSubscription*> iList;
     Fifo<Publisher*> iFree;

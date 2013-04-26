@@ -162,9 +162,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SelectPreset");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("FactoryDefaults");
         action.addInputParameter(new ParameterString("PresetName", allowedValues));
-        allowedValues.clear();
         iDelegateSelectPreset = new DoSelectPreset();
         enableAction(action, iDelegateSelectPreset);
     }
@@ -179,7 +177,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetBrightness");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentBrightness", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentBrightness", 0, 2147483647, 1));
         iDelegateGetBrightness = new DoGetBrightness();
         enableAction(action, iDelegateGetBrightness);
     }
@@ -194,7 +192,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetBrightness");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredBrightness", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredBrightness", 0, 2147483647, 1));
         iDelegateSetBrightness = new DoSetBrightness();
         enableAction(action, iDelegateSetBrightness);
     }
@@ -209,7 +207,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetContrast");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentContrast", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentContrast", 0, 2147483647, 1));
         iDelegateGetContrast = new DoGetContrast();
         enableAction(action, iDelegateGetContrast);
     }
@@ -224,7 +222,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetContrast");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredContrast", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredContrast", 0, 2147483647, 1));
         iDelegateSetContrast = new DoSetContrast();
         enableAction(action, iDelegateSetContrast);
     }
@@ -239,7 +237,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetSharpness");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentSharpness", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentSharpness", 0, 2147483647, 1));
         iDelegateGetSharpness = new DoGetSharpness();
         enableAction(action, iDelegateGetSharpness);
     }
@@ -254,7 +252,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetSharpness");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredSharpness", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredSharpness", 0, 2147483647, 1));
         iDelegateSetSharpness = new DoSetSharpness();
         enableAction(action, iDelegateSetSharpness);
     }
@@ -269,7 +267,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetRedVideoGain");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentRedVideoGain", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentRedVideoGain", 0, 2147483647, 1));
         iDelegateGetRedVideoGain = new DoGetRedVideoGain();
         enableAction(action, iDelegateGetRedVideoGain);
     }
@@ -284,7 +282,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetRedVideoGain");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredRedVideoGain", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredRedVideoGain", 0, 2147483647, 1));
         iDelegateSetRedVideoGain = new DoSetRedVideoGain();
         enableAction(action, iDelegateSetRedVideoGain);
     }
@@ -299,7 +297,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetGreenVideoGain");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentGreenVideoGain", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentGreenVideoGain", 0, 2147483647, 1));
         iDelegateGetGreenVideoGain = new DoGetGreenVideoGain();
         enableAction(action, iDelegateGetGreenVideoGain);
     }
@@ -314,7 +312,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetGreenVideoGain");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredGreenVideoGain", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredGreenVideoGain", 0, 2147483647, 1));
         iDelegateSetGreenVideoGain = new DoSetGreenVideoGain();
         enableAction(action, iDelegateSetGreenVideoGain);
     }
@@ -329,7 +327,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetBlueVideoGain");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentBlueVideoGain", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentBlueVideoGain", 0, 2147483647, 1));
         iDelegateGetBlueVideoGain = new DoGetBlueVideoGain();
         enableAction(action, iDelegateGetBlueVideoGain);
     }
@@ -344,7 +342,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetBlueVideoGain");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredBlueVideoGain", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredBlueVideoGain", 0, 2147483647, 1));
         iDelegateSetBlueVideoGain = new DoSetBlueVideoGain();
         enableAction(action, iDelegateSetBlueVideoGain);
     }
@@ -359,7 +357,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetRedVideoBlackLevel");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentRedVideoBlackLevel", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentRedVideoBlackLevel", 0, 2147483647, 1));
         iDelegateGetRedVideoBlackLevel = new DoGetRedVideoBlackLevel();
         enableAction(action, iDelegateGetRedVideoBlackLevel);
     }
@@ -374,7 +372,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetRedVideoBlackLevel");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredRedVideoBlackLevel", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredRedVideoBlackLevel", 0, 2147483647, 1));
         iDelegateSetRedVideoBlackLevel = new DoSetRedVideoBlackLevel();
         enableAction(action, iDelegateSetRedVideoBlackLevel);
     }
@@ -389,7 +387,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetGreenVideoBlackLevel");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentGreenVideoBlackLevel", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentGreenVideoBlackLevel", 0, 2147483647, 1));
         iDelegateGetGreenVideoBlackLevel = new DoGetGreenVideoBlackLevel();
         enableAction(action, iDelegateGetGreenVideoBlackLevel);
     }
@@ -404,7 +402,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetGreenVideoBlackLevel");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredGreenVideoBlackLevel", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredGreenVideoBlackLevel", 0, 2147483647, 1));
         iDelegateSetGreenVideoBlackLevel = new DoSetGreenVideoBlackLevel();
         enableAction(action, iDelegateSetGreenVideoBlackLevel);
     }
@@ -419,7 +417,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetBlueVideoBlackLevel");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentBlueVideoBlackLevel", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentBlueVideoBlackLevel", 0, 2147483647, 1));
         iDelegateGetBlueVideoBlackLevel = new DoGetBlueVideoBlackLevel();
         enableAction(action, iDelegateGetBlueVideoBlackLevel);
     }
@@ -434,7 +432,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetBlueVideoBlackLevel");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredBlueVideoBlackLevel", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredBlueVideoBlackLevel", 0, 2147483647, 1));
         iDelegateSetBlueVideoBlackLevel = new DoSetBlueVideoBlackLevel();
         enableAction(action, iDelegateSetBlueVideoBlackLevel);
     }
@@ -449,7 +447,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetColorTemperature");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addOutputParameter(new ParameterUint("CurrentColorTemperature", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentColorTemperature", 0, 2147483647, 1));
         iDelegateGetColorTemperature = new DoGetColorTemperature();
         enableAction(action, iDelegateGetColorTemperature);
     }
@@ -464,7 +462,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetColorTemperature");
         action.addInputParameter(new ParameterUint("InstanceID"));
-        action.addInputParameter(new ParameterUint("DesiredColorTemperature", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredColorTemperature", 0, 2147483647, 1));
         iDelegateSetColorTemperature = new DoSetColorTemperature();
         enableAction(action, iDelegateSetColorTemperature);
     }
@@ -539,9 +537,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetMute");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("Master");
         action.addInputParameter(new ParameterString("Channel", allowedValues));
-        allowedValues.clear();
         action.addOutputParameter(new ParameterBool("CurrentMute"));
         iDelegateGetMute = new DoGetMute();
         enableAction(action, iDelegateGetMute);
@@ -557,9 +553,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetMute");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("Master");
         action.addInputParameter(new ParameterString("Channel", allowedValues));
-        allowedValues.clear();
         action.addInputParameter(new ParameterBool("DesiredMute"));
         iDelegateSetMute = new DoSetMute();
         enableAction(action, iDelegateSetMute);
@@ -575,10 +569,8 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetVolume");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("Master");
         action.addInputParameter(new ParameterString("Channel", allowedValues));
-        allowedValues.clear();
-        action.addOutputParameter(new ParameterUint("CurrentVolume", 0, 0, 1));
+        action.addOutputParameter(new ParameterUint("CurrentVolume", 0, 2147483647, 1));
         iDelegateGetVolume = new DoGetVolume();
         enableAction(action, iDelegateGetVolume);
     }
@@ -593,10 +585,8 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetVolume");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("Master");
         action.addInputParameter(new ParameterString("Channel", allowedValues));
-        allowedValues.clear();
-        action.addInputParameter(new ParameterUint("DesiredVolume", 0, 0, 1));
+        action.addInputParameter(new ParameterUint("DesiredVolume", 0, 2147483647, 1));
         iDelegateSetVolume = new DoSetVolume();
         enableAction(action, iDelegateSetVolume);
     }
@@ -611,9 +601,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetVolumeDB");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("Master");
         action.addInputParameter(new ParameterString("Channel", allowedValues));
-        allowedValues.clear();
         action.addOutputParameter(new ParameterInt("CurrentVolume"));
         iDelegateGetVolumeDB = new DoGetVolumeDB();
         enableAction(action, iDelegateGetVolumeDB);
@@ -629,9 +617,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetVolumeDB");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("Master");
         action.addInputParameter(new ParameterString("Channel", allowedValues));
-        allowedValues.clear();
         action.addInputParameter(new ParameterInt("DesiredVolume"));
         iDelegateSetVolumeDB = new DoSetVolumeDB();
         enableAction(action, iDelegateSetVolumeDB);
@@ -647,9 +633,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetVolumeDBRange");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("Master");
         action.addInputParameter(new ParameterString("Channel", allowedValues));
-        allowedValues.clear();
         action.addOutputParameter(new ParameterInt("MinValue"));
         action.addOutputParameter(new ParameterInt("MaxValue"));
         iDelegateGetVolumeDBRange = new DoGetVolumeDBRange();
@@ -666,9 +650,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("GetLoudness");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("Master");
         action.addInputParameter(new ParameterString("Channel", allowedValues));
-        allowedValues.clear();
         action.addOutputParameter(new ParameterBool("CurrentLoudness"));
         iDelegateGetLoudness = new DoGetLoudness();
         enableAction(action, iDelegateGetLoudness);
@@ -684,9 +666,7 @@ public class DvProviderUpnpOrgRenderingControl2 extends DvProvider implements ID
     {
         Action action = new Action("SetLoudness");        List<String> allowedValues = new LinkedList<String>();
         action.addInputParameter(new ParameterUint("InstanceID"));
-        allowedValues.add("Master");
         action.addInputParameter(new ParameterString("Channel", allowedValues));
-        allowedValues.clear();
         action.addInputParameter(new ParameterBool("DesiredLoudness"));
         iDelegateSetLoudness = new DoSetLoudness();
         enableAction(action, iDelegateSetLoudness);

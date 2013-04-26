@@ -2,8 +2,9 @@
 #include <OpenHome/Net/Core/OhNet.h>
 #include <OpenHome/Functor.h>
 #include <OpenHome/FunctorMsg.h>
-#include <OpenHome/Net/Private/Stack.h>
+#include <OpenHome/Private/Env.h>
 #include <OpenHome/Private/Debug.h>
+#include <OpenHome/Net/Private/Globals.h>
 
 #include <stdlib.h>
 
@@ -12,7 +13,7 @@ using namespace OpenHome::Net;
 
 int32_t STDCALL OhNetLibraryInitialise(OhNetHandleInitParams aInitParams)
 {
-    if (Stack::IsInitialised()) {
+    if (gEnv != NULL) {
         return -1;
     }
     InitialisationParams* ip = reinterpret_cast<InitialisationParams*>(aInitParams);
@@ -27,7 +28,7 @@ int32_t STDCALL OhNetLibraryInitialise(OhNetHandleInitParams aInitParams)
 
 int32_t STDCALL OhNetLibraryInitialiseMinimal(OhNetHandleInitParams aInitParams)
 {
-    if (Stack::IsInitialised()) {
+    if (gEnv != NULL) {
         return -1;
     }
     InitialisationParams* ip = reinterpret_cast<InitialisationParams*>(aInitParams);
@@ -366,6 +367,13 @@ TIpAddress STDCALL OhNetNetworkAdapterSubnet(OhNetHandleNetworkAdapter aNif)
     return nif->Subnet();
 }
 
+TIpAddress STDCALL OhNetNetworkAdapterMask(OhNetHandleNetworkAdapter aNif)
+{
+    NetworkAdapter* nif = reinterpret_cast<NetworkAdapter*>(aNif);
+    ASSERT(nif != NULL);
+    return nif->Mask();
+}
+
 const char* STDCALL OhNetNetworkAdapterName(OhNetHandleNetworkAdapter aNif)
 {
     NetworkAdapter* nif = reinterpret_cast<NetworkAdapter*>(aNif);
@@ -419,6 +427,31 @@ void STDCALL OhNetSubnetListDestroy(OhNetHandleNetworkAdapterList aList)
     UpnpLibrary::DestroySubnetList(list);
 }
 
+OhNetHandleNetworkAdapterList STDCALL OhNetNetworkAdapterListCreate()
+{
+    return (OhNetHandleNetworkAdapterList)UpnpLibrary::CreateNetworkAdapterList();
+}
+
+uint32_t STDCALL OhNetNetworkAdapterListSize(OhNetHandleNetworkAdapterList aList)
+{
+    std::vector<NetworkAdapter*>* list = reinterpret_cast<std::vector<NetworkAdapter*>*>(aList);
+    ASSERT(list != NULL);
+    return (TUint)list->size();
+}
+
+OhNetHandleNetworkAdapter STDCALL OhNetNetworkAdapterAt(OhNetHandleNetworkAdapterList aList, uint32_t aIndex)
+{
+    std::vector<NetworkAdapter*>* list = reinterpret_cast<std::vector<NetworkAdapter*>*>(aList);
+    ASSERT(list != NULL);
+    return (OhNetHandleNetworkAdapter)(*list)[aIndex];
+}
+
+void STDCALL OhNetNetworkAdapterListDestroy(OhNetHandleNetworkAdapterList aList)
+{
+    std::vector<NetworkAdapter*>* list = reinterpret_cast<std::vector<NetworkAdapter*>*>(aList);
+    UpnpLibrary::DestroyNetworkAdapterList(list);
+}
+
 void STDCALL OhNetSetCurrentSubnet(uint32_t aSubnet)
 {
     UpnpLibrary::SetCurrentSubnet(aSubnet);
@@ -431,7 +464,7 @@ OhNetHandleNetworkAdapter STDCALL OhNetCurrentSubnetAdapter(const char* aCookie)
 
 void STDCALL OhNetFreeExternal(void* aPtr)
 {
-    OhNetCallbackFreeExternal cb = Stack::InitParams().FreeExternal();
+    OhNetCallbackFreeExternal cb = gEnv->InitParams().FreeExternal();
     if (cb != NULL) {
         cb(aPtr);
     }

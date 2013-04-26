@@ -5,6 +5,7 @@
 #include <OpenHome/Net/Private/AsyncPrivate.h>
 #include <OpenHome/Buffer.h>
 #include <OpenHome/Net/Cpp/CpDevice.h>
+#include <OpenHome/Net/Private/CpiDevice.h>
 
 #include <string>
 
@@ -573,8 +574,16 @@ CpProxyUpnpOrgAVTransport2Cpp::CpProxyUpnpOrgAVTransport2Cpp(CpDeviceCpp& aDevic
     iActionGetMediaInfo->AddOutputParameter(param);
     param = new OpenHome::Net::ParameterString("RecordMedium");
     iActionGetMediaInfo->AddOutputParameter(param);
-    param = new OpenHome::Net::ParameterString("WriteStatus");
+    index = 0;
+    allowedValues = new TChar*[5];
+    allowedValues[index++] = (TChar*)"WRITABLE";
+    allowedValues[index++] = (TChar*)"PROTECTED";
+    allowedValues[index++] = (TChar*)"NOT_WRITABLE";
+    allowedValues[index++] = (TChar*)"UNKNOWN";
+    allowedValues[index++] = (TChar*)"NOT_IMPLEMENTED";
+    param = new OpenHome::Net::ParameterString("WriteStatus", allowedValues, 5);
     iActionGetMediaInfo->AddOutputParameter(param);
+    delete[] allowedValues;
 
     iActionGetMediaInfo_Ext = new Action("GetMediaInfo_Ext");
     param = new OpenHome::Net::ParameterUint("InstanceID");
@@ -603,32 +612,26 @@ CpProxyUpnpOrgAVTransport2Cpp::CpProxyUpnpOrgAVTransport2Cpp(CpDeviceCpp& aDevic
     iActionGetMediaInfo_Ext->AddOutputParameter(param);
     param = new OpenHome::Net::ParameterString("RecordMedium");
     iActionGetMediaInfo_Ext->AddOutputParameter(param);
-    param = new OpenHome::Net::ParameterString("WriteStatus");
+    index = 0;
+    allowedValues = new TChar*[5];
+    allowedValues[index++] = (TChar*)"WRITABLE";
+    allowedValues[index++] = (TChar*)"PROTECTED";
+    allowedValues[index++] = (TChar*)"NOT_WRITABLE";
+    allowedValues[index++] = (TChar*)"UNKNOWN";
+    allowedValues[index++] = (TChar*)"NOT_IMPLEMENTED";
+    param = new OpenHome::Net::ParameterString("WriteStatus", allowedValues, 5);
     iActionGetMediaInfo_Ext->AddOutputParameter(param);
+    delete[] allowedValues;
 
     iActionGetTransportInfo = new Action("GetTransportInfo");
     param = new OpenHome::Net::ParameterUint("InstanceID");
     iActionGetTransportInfo->AddInputParameter(param);
-    index = 0;
-    allowedValues = new TChar*[2];
-    allowedValues[index++] = (TChar*)"STOPPED";
-    allowedValues[index++] = (TChar*)"PLAYING";
-    param = new OpenHome::Net::ParameterString("CurrentTransportState", allowedValues, 2);
+    param = new OpenHome::Net::ParameterString("CurrentTransportState");
     iActionGetTransportInfo->AddOutputParameter(param);
-    delete[] allowedValues;
-    index = 0;
-    allowedValues = new TChar*[2];
-    allowedValues[index++] = (TChar*)"OK";
-    allowedValues[index++] = (TChar*)"ERROR_OCCURRED";
-    param = new OpenHome::Net::ParameterString("CurrentTransportStatus", allowedValues, 2);
+    param = new OpenHome::Net::ParameterString("CurrentTransportStatus");
     iActionGetTransportInfo->AddOutputParameter(param);
-    delete[] allowedValues;
-    index = 0;
-    allowedValues = new TChar*[1];
-    allowedValues[index++] = (TChar*)"1";
-    param = new OpenHome::Net::ParameterString("CurrentSpeed", allowedValues, 1);
+    param = new OpenHome::Net::ParameterString("CurrentSpeed");
     iActionGetTransportInfo->AddOutputParameter(param);
-    delete[] allowedValues;
 
     iActionGetPositionInfo = new Action("GetPositionInfo");
     param = new OpenHome::Net::ParameterUint("InstanceID");
@@ -664,9 +667,15 @@ CpProxyUpnpOrgAVTransport2Cpp::CpProxyUpnpOrgAVTransport2Cpp(CpDeviceCpp& aDevic
     param = new OpenHome::Net::ParameterUint("InstanceID");
     iActionGetTransportSettings->AddInputParameter(param);
     index = 0;
-    allowedValues = new TChar*[1];
+    allowedValues = new TChar*[7];
     allowedValues[index++] = (TChar*)"NORMAL";
-    param = new OpenHome::Net::ParameterString("PlayMode", allowedValues, 1);
+    allowedValues[index++] = (TChar*)"SHUFFLE";
+    allowedValues[index++] = (TChar*)"REPEAT_ONE";
+    allowedValues[index++] = (TChar*)"REPEAT_ALL";
+    allowedValues[index++] = (TChar*)"RANDOM";
+    allowedValues[index++] = (TChar*)"DIRECT_1";
+    allowedValues[index++] = (TChar*)"INTRO";
+    param = new OpenHome::Net::ParameterString("PlayMode", allowedValues, 7);
     iActionGetTransportSettings->AddOutputParameter(param);
     delete[] allowedValues;
     param = new OpenHome::Net::ParameterString("RecQualityMode");
@@ -679,12 +688,8 @@ CpProxyUpnpOrgAVTransport2Cpp::CpProxyUpnpOrgAVTransport2Cpp(CpDeviceCpp& aDevic
     iActionPlay = new Action("Play");
     param = new OpenHome::Net::ParameterUint("InstanceID");
     iActionPlay->AddInputParameter(param);
-    index = 0;
-    allowedValues = new TChar*[1];
-    allowedValues[index++] = (TChar*)"1";
-    param = new OpenHome::Net::ParameterString("Speed", allowedValues, 1);
+    param = new OpenHome::Net::ParameterString("Speed");
     iActionPlay->AddInputParameter(param);
-    delete[] allowedValues;
 
     iActionPause = new Action("Pause");
     param = new OpenHome::Net::ParameterUint("InstanceID");
@@ -698,9 +703,16 @@ CpProxyUpnpOrgAVTransport2Cpp::CpProxyUpnpOrgAVTransport2Cpp(CpDeviceCpp& aDevic
     param = new OpenHome::Net::ParameterUint("InstanceID");
     iActionSeek->AddInputParameter(param);
     index = 0;
-    allowedValues = new TChar*[1];
+    allowedValues = new TChar*[8];
+    allowedValues[index++] = (TChar*)"ABS_TIME";
+    allowedValues[index++] = (TChar*)"REL_TIME";
+    allowedValues[index++] = (TChar*)"ABS_COUNT";
+    allowedValues[index++] = (TChar*)"REL_COUNT";
     allowedValues[index++] = (TChar*)"TRACK_NR";
-    param = new OpenHome::Net::ParameterString("Unit", allowedValues, 1);
+    allowedValues[index++] = (TChar*)"CHANNEL_FREQ";
+    allowedValues[index++] = (TChar*)"TAPE-INDEX";
+    allowedValues[index++] = (TChar*)"FRAME";
+    param = new OpenHome::Net::ParameterString("Unit", allowedValues, 8);
     iActionSeek->AddInputParameter(param);
     delete[] allowedValues;
     param = new OpenHome::Net::ParameterString("Target");
@@ -718,9 +730,15 @@ CpProxyUpnpOrgAVTransport2Cpp::CpProxyUpnpOrgAVTransport2Cpp(CpDeviceCpp& aDevic
     param = new OpenHome::Net::ParameterUint("InstanceID");
     iActionSetPlayMode->AddInputParameter(param);
     index = 0;
-    allowedValues = new TChar*[1];
+    allowedValues = new TChar*[7];
     allowedValues[index++] = (TChar*)"NORMAL";
-    param = new OpenHome::Net::ParameterString("NewPlayMode", allowedValues, 1);
+    allowedValues[index++] = (TChar*)"SHUFFLE";
+    allowedValues[index++] = (TChar*)"REPEAT_ONE";
+    allowedValues[index++] = (TChar*)"REPEAT_ALL";
+    allowedValues[index++] = (TChar*)"RANDOM";
+    allowedValues[index++] = (TChar*)"DIRECT_1";
+    allowedValues[index++] = (TChar*)"INTRO";
+    param = new OpenHome::Net::ParameterString("NewPlayMode", allowedValues, 7);
     iActionSetPlayMode->AddInputParameter(param);
     delete[] allowedValues;
 
@@ -740,9 +758,16 @@ CpProxyUpnpOrgAVTransport2Cpp::CpProxyUpnpOrgAVTransport2Cpp(CpDeviceCpp& aDevic
     param = new OpenHome::Net::ParameterUint("InstanceID");
     iActionGetDRMState->AddInputParameter(param);
     index = 0;
-    allowedValues = new TChar*[1];
+    allowedValues = new TChar*[8];
     allowedValues[index++] = (TChar*)"OK";
-    param = new OpenHome::Net::ParameterString("CurrentDRMState", allowedValues, 1);
+    allowedValues[index++] = (TChar*)"UNKNOWN";
+    allowedValues[index++] = (TChar*)"PROCESSING_CONTENT_KEY";
+    allowedValues[index++] = (TChar*)"CONTENT_KEY_FAILURE";
+    allowedValues[index++] = (TChar*)"ATTEMPTING_AUTHENTICATION";
+    allowedValues[index++] = (TChar*)"FAILED_AUTHENTICATION";
+    allowedValues[index++] = (TChar*)"NOT_AUTHENTICATED";
+    allowedValues[index++] = (TChar*)"DEVICE_REVOCATION";
+    param = new OpenHome::Net::ParameterString("CurrentDRMState", allowedValues, 8);
     iActionGetDRMState->AddOutputParameter(param);
     delete[] allowedValues;
 
@@ -770,10 +795,10 @@ CpProxyUpnpOrgAVTransport2Cpp::CpProxyUpnpOrgAVTransport2Cpp(CpDeviceCpp& aDevic
 
     Functor functor;
     functor = MakeFunctor(*this, &CpProxyUpnpOrgAVTransport2Cpp::LastChangePropertyChanged);
-    iLastChange = new PropertyString("LastChange", functor);
+    iLastChange = new PropertyString(aDevice.Device().GetCpStack().Env(), "LastChange", functor);
     AddProperty(iLastChange);
     functor = MakeFunctor(*this, &CpProxyUpnpOrgAVTransport2Cpp::DRMStatePropertyChanged);
-    iDRMState = new PropertyString("DRMState", functor);
+    iDRMState = new PropertyString(aDevice.Device().GetCpStack().Env(), "DRMState", functor);
     AddProperty(iDRMState);
 }
 

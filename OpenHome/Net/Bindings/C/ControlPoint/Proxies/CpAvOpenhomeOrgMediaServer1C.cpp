@@ -11,6 +11,7 @@
 #include <OpenHome/Private/Thread.h>
 #include <OpenHome/Net/Private/AsyncPrivate.h>
 #include <OpenHome/Net/Core/CpDevice.h>
+#include <OpenHome/Net/Private/CpiDevice.h>
 
 using namespace OpenHome;
 using namespace OpenHome::Net;
@@ -49,10 +50,6 @@ public:
     void SyncUpdateCount(TUint& aValue);
     void BeginUpdateCount(FunctorAsync& aFunctor);
     void EndUpdateCount(IAsync& aAsync, TUint& aValue);
-
-    void SyncQuery(const Brx& aRequest, Brh& aResult);
-    void BeginQuery(const Brx& aRequest, FunctorAsync& aFunctor);
-    void EndQuery(IAsync& aAsync, Brh& aResult);
 
     void SetPropertyManufacturerNameChanged(Functor& aFunctor);
     void SetPropertyManufacturerInfoChanged(Functor& aFunctor);
@@ -113,7 +110,6 @@ private:
     Action* iActionQueryPort;
     Action* iActionBrowsePort;
     Action* iActionUpdateCount;
-    Action* iActionQuery;
     PropertyString* iManufacturerName;
     PropertyString* iManufacturerInfo;
     PropertyString* iManufacturerUrl;
@@ -327,29 +323,6 @@ void SyncUpdateCountAvOpenhomeOrgMediaServer1C::CompleteRequest(IAsync& aAsync)
     iService.EndUpdateCount(aAsync, iValue);
 }
 
-
-class SyncQueryAvOpenhomeOrgMediaServer1C : public SyncProxyAction
-{
-public:
-    SyncQueryAvOpenhomeOrgMediaServer1C(CpProxyAvOpenhomeOrgMediaServer1C& aProxy, Brh& aResult);
-    virtual void CompleteRequest(IAsync& aAsync);
-    virtual ~SyncQueryAvOpenhomeOrgMediaServer1C() {};
-private:
-    CpProxyAvOpenhomeOrgMediaServer1C& iService;
-    Brh& iResult;
-};
-
-SyncQueryAvOpenhomeOrgMediaServer1C::SyncQueryAvOpenhomeOrgMediaServer1C(CpProxyAvOpenhomeOrgMediaServer1C& aProxy, Brh& aResult)
-    : iService(aProxy)
-    , iResult(aResult)
-{
-}
-
-void SyncQueryAvOpenhomeOrgMediaServer1C::CompleteRequest(IAsync& aAsync)
-{
-    iService.EndQuery(aAsync, iResult);
-}
-
 CpProxyAvOpenhomeOrgMediaServer1C::CpProxyAvOpenhomeOrgMediaServer1C(CpDeviceC aDevice)
     : CpProxyC("av-openhome-org", "MediaServer", 1, *reinterpret_cast<CpiDevice*>(aDevice))
     , iLock("MPCS")
@@ -402,60 +375,54 @@ CpProxyAvOpenhomeOrgMediaServer1C::CpProxyAvOpenhomeOrgMediaServer1C(CpDeviceC a
     param = new OpenHome::Net::ParameterUint("Value");
     iActionUpdateCount->AddOutputParameter(param);
 
-    iActionQuery = new Action("Query");
-    param = new OpenHome::Net::ParameterString("Request");
-    iActionQuery->AddInputParameter(param);
-    param = new OpenHome::Net::ParameterString("Result");
-    iActionQuery->AddOutputParameter(param);
-
     Functor functor;
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ManufacturerNamePropertyChanged);
-    iManufacturerName = new PropertyString("ManufacturerName", functor);
+    iManufacturerName = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ManufacturerName", functor);
     AddProperty(iManufacturerName);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ManufacturerInfoPropertyChanged);
-    iManufacturerInfo = new PropertyString("ManufacturerInfo", functor);
+    iManufacturerInfo = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ManufacturerInfo", functor);
     AddProperty(iManufacturerInfo);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ManufacturerUrlPropertyChanged);
-    iManufacturerUrl = new PropertyString("ManufacturerUrl", functor);
+    iManufacturerUrl = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ManufacturerUrl", functor);
     AddProperty(iManufacturerUrl);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ManufacturerImageUriPropertyChanged);
-    iManufacturerImageUri = new PropertyString("ManufacturerImageUri", functor);
+    iManufacturerImageUri = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ManufacturerImageUri", functor);
     AddProperty(iManufacturerImageUri);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ModelNamePropertyChanged);
-    iModelName = new PropertyString("ModelName", functor);
+    iModelName = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ModelName", functor);
     AddProperty(iModelName);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ModelInfoPropertyChanged);
-    iModelInfo = new PropertyString("ModelInfo", functor);
+    iModelInfo = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ModelInfo", functor);
     AddProperty(iModelInfo);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ModelUrlPropertyChanged);
-    iModelUrl = new PropertyString("ModelUrl", functor);
+    iModelUrl = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ModelUrl", functor);
     AddProperty(iModelUrl);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ModelImageUriPropertyChanged);
-    iModelImageUri = new PropertyString("ModelImageUri", functor);
+    iModelImageUri = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ModelImageUri", functor);
     AddProperty(iModelImageUri);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ProductNamePropertyChanged);
-    iProductName = new PropertyString("ProductName", functor);
+    iProductName = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ProductName", functor);
     AddProperty(iProductName);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ProductInfoPropertyChanged);
-    iProductInfo = new PropertyString("ProductInfo", functor);
+    iProductInfo = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ProductInfo", functor);
     AddProperty(iProductInfo);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ProductUrlPropertyChanged);
-    iProductUrl = new PropertyString("ProductUrl", functor);
+    iProductUrl = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ProductUrl", functor);
     AddProperty(iProductUrl);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::ProductImageUriPropertyChanged);
-    iProductImageUri = new PropertyString("ProductImageUri", functor);
+    iProductImageUri = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "ProductImageUri", functor);
     AddProperty(iProductImageUri);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::AttributesPropertyChanged);
-    iAttributes = new PropertyString("Attributes", functor);
+    iAttributes = new PropertyString(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "Attributes", functor);
     AddProperty(iAttributes);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::QueryPortPropertyChanged);
-    iQueryPort = new PropertyUint("QueryPort", functor);
+    iQueryPort = new PropertyUint(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "QueryPort", functor);
     AddProperty(iQueryPort);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::BrowsePortPropertyChanged);
-    iBrowsePort = new PropertyUint("BrowsePort", functor);
+    iBrowsePort = new PropertyUint(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "BrowsePort", functor);
     AddProperty(iBrowsePort);
     functor = MakeFunctor(*this, &CpProxyAvOpenhomeOrgMediaServer1C::UpdateCountPropertyChanged);
-    iUpdateCount = new PropertyUint("UpdateCount", functor);
+    iUpdateCount = new PropertyUint(reinterpret_cast<CpiDevice*>(aDevice)->GetCpStack().Env(), "UpdateCount", functor);
     AddProperty(iUpdateCount);
 }
 
@@ -469,7 +436,6 @@ CpProxyAvOpenhomeOrgMediaServer1C::~CpProxyAvOpenhomeOrgMediaServer1C()
     delete iActionQueryPort;
     delete iActionBrowsePort;
     delete iActionUpdateCount;
-    delete iActionQuery;
 }
 
 void CpProxyAvOpenhomeOrgMediaServer1C::SyncManufacturer(Brh& aName, Brh& aInfo, Brh& aUrl, Brh& aImageUri)
@@ -712,41 +678,6 @@ void CpProxyAvOpenhomeOrgMediaServer1C::EndUpdateCount(IAsync& aAsync, TUint& aV
     }
     TUint index = 0;
     aValue = ((ArgumentUint*)invocation.OutputArguments()[index++])->Value();
-}
-
-void CpProxyAvOpenhomeOrgMediaServer1C::SyncQuery(const Brx& aRequest, Brh& aResult)
-{
-    SyncQueryAvOpenhomeOrgMediaServer1C sync(*this, aResult);
-    BeginQuery(aRequest, sync.Functor());
-    sync.Wait();
-}
-
-void CpProxyAvOpenhomeOrgMediaServer1C::BeginQuery(const Brx& aRequest, FunctorAsync& aFunctor)
-{
-    Invocation* invocation = Service()->Invocation(*iActionQuery, aFunctor);
-    TUint inIndex = 0;
-    const Action::VectorParameters& inParams = iActionQuery->InputParameters();
-    invocation->AddInput(new ArgumentString(*inParams[inIndex++], aRequest));
-    TUint outIndex = 0;
-    const Action::VectorParameters& outParams = iActionQuery->OutputParameters();
-    invocation->AddOutput(new ArgumentString(*outParams[outIndex++]));
-    Invocable().InvokeAction(*invocation);
-}
-
-void CpProxyAvOpenhomeOrgMediaServer1C::EndQuery(IAsync& aAsync, Brh& aResult)
-{
-    ASSERT(((Async&)aAsync).Type() == Async::eInvocation);
-    Invocation& invocation = (Invocation&)aAsync;
-    ASSERT(invocation.Action().Name() == Brn("Query"));
-
-    Error::ELevel level;
-	TUint code;
-	const TChar* ignore;
-	if (invocation.Error(level, code, ignore)) {
-        throw(ProxyError(level, code));
-    }
-    TUint index = 0;
-    ((ArgumentString*)invocation.OutputArguments()[index++])->TransferTo(aResult);
 }
 
 void CpProxyAvOpenhomeOrgMediaServer1C::SetPropertyManufacturerNameChanged(Functor& aFunctor)
@@ -1421,52 +1352,6 @@ int32_t STDCALL CpProxyAvOpenhomeOrgMediaServer1EndUpdateCount(THandle aHandle, 
     ASSERT(async != NULL);
     try {
         proxyC->EndUpdateCount(*async, *aValue);
-    }
-    catch(...) {
-        err = -1;
-    }
-    return err;
-}
-
-int32_t STDCALL CpProxyAvOpenhomeOrgMediaServer1SyncQuery(THandle aHandle, const char* aRequest, char** aResult)
-{
-    CpProxyAvOpenhomeOrgMediaServer1C* proxyC = reinterpret_cast<CpProxyAvOpenhomeOrgMediaServer1C*>(aHandle);
-    ASSERT(proxyC != NULL);
-    Brh buf_aRequest(aRequest);
-    Brh buf_aResult;
-    int32_t err = 0;
-    try {
-        proxyC->SyncQuery(buf_aRequest, buf_aResult);
-        *aResult = buf_aResult.Extract();
-    }
-    catch (ProxyError& ) {
-        err = -1;
-        *aResult = NULL;
-    }
-    return err;
-}
-
-void STDCALL CpProxyAvOpenhomeOrgMediaServer1BeginQuery(THandle aHandle, const char* aRequest, OhNetCallbackAsync aCallback, void* aPtr)
-{
-    CpProxyAvOpenhomeOrgMediaServer1C* proxyC = reinterpret_cast<CpProxyAvOpenhomeOrgMediaServer1C*>(aHandle);
-    ASSERT(proxyC != NULL);
-    Brh buf_aRequest(aRequest);
-    FunctorAsync functor = MakeFunctorAsync(aPtr, (OhNetFunctorAsync)aCallback);
-    proxyC->BeginQuery(buf_aRequest, functor);
-}
-
-int32_t STDCALL CpProxyAvOpenhomeOrgMediaServer1EndQuery(THandle aHandle, OhNetHandleAsync aAsync, char** aResult)
-{
-    int32_t err = 0;
-    CpProxyAvOpenhomeOrgMediaServer1C* proxyC = reinterpret_cast<CpProxyAvOpenhomeOrgMediaServer1C*>(aHandle);
-    ASSERT(proxyC != NULL);
-    IAsync* async = reinterpret_cast<IAsync*>(aAsync);
-    ASSERT(async != NULL);
-    Brh buf_aResult;
-    *aResult = NULL;
-    try {
-        proxyC->EndQuery(*async, buf_aResult);
-        *aResult = buf_aResult.Extract();
     }
     catch(...) {
         err = -1;

@@ -86,7 +86,6 @@ public:
 
     static TBool CaseInsensitiveEquals(TChar aValue1, TChar aValue2);
     static TBool CaseInsensitiveEquals(const Brx& aBuffer1, const Brx& aBuffer2);
-    static TBool RemoveTheFromStart(const Brx& aSrc, Bwx& aDst);
 
     static TUint AppendDec(Bwx& aBuffer, TUint8 aValue);
     static TUint AppendDec(Bwx& aBuffer, TInt8 aValue);
@@ -103,6 +102,7 @@ public:
 
     static TBool ContainsWhitespace(const Brx& aBuffer);
     static TBool Contains(const Brx& aBuffer, TChar aValue);
+    static TBool Contains(const Brx& aBuffer, const Brx& aValue);
     static TUint IndexOf(const Brx& aBuffer, TChar aValue);    // returns index of aValue (or aBuffer.Bytes() if not in)
     static void  Substitute(Bwx& aBuffer, TChar aSearch, TChar aReplace);
 

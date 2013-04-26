@@ -34,7 +34,7 @@ Brn Srx::Read(TUint aBytes)
             THROW(ReaderError);
         }
 
-        if (iMaxBytes - iOffset < aBytes) { // unable to fit requested bytes after current offset
+        if (iMaxBytes - iOffset < aBytes) {
             (void)memmove(ptr, ptr + iOffset, iBytes - iOffset); // so make some more room
             iBytes -= iOffset;
             iOffset = 0;
@@ -109,6 +109,13 @@ void Srx::ReadFlush()
 void Srx::ReadInterrupt()
 {
     iSource.ReadInterrupt();
+}
+
+Brn Srx::Peek(TUint aBytes)
+{
+    Brn buf = Read(aBytes);
+    iOffset -= buf.Bytes(); // rewind to the start of the buffer we've just read
+    return buf;
 }
 
 Brn Srx::Snaffle()

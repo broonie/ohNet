@@ -55,7 +55,7 @@ private:
     TUint16 iPort;
 };
 
-class Socket
+class Socket : public INonCopyable
 {
 public:
     void Close();
@@ -76,9 +76,9 @@ protected:
     void Bind(const Endpoint& aEndpoint);
     void GetPort(TUint& aPort);
     void Listen(TUint aSlots);
-    THandle Accept();
+    THandle Accept(Endpoint& aClientEndpoint);
 private:
-    void Log(const char* aPrefix, const Brx& aBuffer);
+    void Log(const char* aPrefix, const Brx& aBuffer) const;
 protected:
     THandle iHandle;
 private:
@@ -86,6 +86,7 @@ private:
     static const uint32_t kLogPlainText = 1;
     static const uint32_t kLogHex       = 2;
     uint32_t iLog;
+    mutable Mutex iLogLock;
 };
 
 /**
@@ -138,12 +139,14 @@ protected:
     SocketTcp();
 };
 
+class Environment;
+
 /// Tcp client
 
 class SocketTcpClient : public SocketTcp
 {
 public:
-    void Open();                                                /// Open
+    void Open(Environment& aEnv);                              /// Open
     void Connect(const Endpoint& aEndpoint, TUint aTimeout);    /// Connect to a given IP address and port number (timeout in milliseconds)
 };
 
@@ -158,6 +161,7 @@ protected:
     SocketTcpSession();
     virtual void Run() = 0;
     virtual ~SocketTcpSession();
+    Endpoint ClientEndpoint() const;
 private:
     void Add(SocketTcpServer& aServer, const TChar* aName, TUint aPriority, TUint aStackBytes);
     void Start();
@@ -168,6 +172,7 @@ private:
     TBool iOpen;
     SocketTcpServer* iServer;
     ThreadFunctor* iThread;
+    Endpoint iClientEndpoint;
 };
 
 // Tcp Server
@@ -176,8 +181,9 @@ class SocketTcpServer : public Socket
 {
     friend class SocketTcpSession;
 public:
-    SocketTcpServer(const TChar* aName, TUint aPort, TIpAddress aInterface, TUint aSessionPriority = kPriorityHigh,
-                    TUint aSessionStackBytes = Thread::kDefaultStackBytes, TUint aSlots = 128);
+    SocketTcpServer(Environment& aEnv, const TChar* aName, TUint aPort, TIpAddress aInterface,
+                    TUint aSessionPriority = kPriorityHigh, TUint aSessionStackBytes = Thread::kDefaultStackBytes,
+                    TUint aSlots = 128);
     // Add is not thread safe, but why would you want that?
     void Add(const TChar* aName, SocketTcpSession* aSession, TInt aPriorityOffset = 0);
     TUint Port() const { return iPort; }
@@ -185,7 +191,7 @@ public:
     ~SocketTcpServer(); // Closes the server
 private:
     TBool Terminating();            // indicates server is in process of being destroyed
-    THandle Accept();               // accept a connection and return the session handle
+    THandle Accept(Endpoint& aClientEndpoint); // accept a connection and return the session handle
 private:
     Mutex iMutex;                   // allows one thread to accept at a time
     TUint iSessionPriority;         // priority given to all session threads
@@ -208,7 +214,7 @@ public:
     TUint Port() const;
     ~SocketUdpBase();
 protected:
-    SocketUdpBase();
+    SocketUdpBase(Environment& aEnv);
 protected:
     TUint iPort;
 };
@@ -216,9 +222,9 @@ protected:
 class SocketUdp : public SocketUdpBase
 {
 public:
-    SocketUdp(); // lets the os select a port
-    SocketUdp(TUint aPort); // stipulate a port
-    SocketUdp(TUint aPort, TIpAddress aInterface); // stipulate a port and an interface
+    SocketUdp(Environment& aEnv); // lets the os select a port
+    SocketUdp(Environment& aEnv, TUint aPort); // stipulate a port
+    SocketUdp(Environment& aEnv, TUint aPort, TIpAddress aInterface); // stipulate a port and an interface
 private:
     void Bind(TUint aPort, TIpAddress aInterface);
 };
@@ -227,7 +233,7 @@ private:
 class SocketUdpMulticast : public SocketUdpBase
 {
 public:
-    SocketUdpMulticast(TIpAddress aInterface, const Endpoint& aEndpoint);
+    SocketUdpMulticast(Environment& aEnv, TIpAddress aInterface, const Endpoint& aEndpoint);
     ~SocketUdpMulticast();
 private:
     TIpAddress iInterface;

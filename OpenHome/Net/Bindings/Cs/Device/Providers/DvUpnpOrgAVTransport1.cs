@@ -135,7 +135,7 @@ namespace OpenHome.Net.Device.Providers
             OpenHome.Net.Core.Action action = new OpenHome.Net.Core.Action("GetMediaInfo");
             List<String> allowedValues = new List<String>();
             action.AddInputParameter(new ParameterUint("InstanceID"));
-            action.AddOutputParameter(new ParameterUint("NrTracks", 0, 0));
+            action.AddOutputParameter(new ParameterUint("NrTracks", 0));
             action.AddOutputParameter(new ParameterString("MediaDuration", allowedValues));
             action.AddOutputParameter(new ParameterString("CurrentURI", allowedValues));
             action.AddOutputParameter(new ParameterString("CurrentURIMetaData", allowedValues));
@@ -143,7 +143,13 @@ namespace OpenHome.Net.Device.Providers
             action.AddOutputParameter(new ParameterString("NextURIMetaData", allowedValues));
             action.AddOutputParameter(new ParameterString("PlayMedium", allowedValues));
             action.AddOutputParameter(new ParameterString("RecordMedium", allowedValues));
+            allowedValues.Add("WRITABLE");
+            allowedValues.Add("PROTECTED");
+            allowedValues.Add("NOT_WRITABLE");
+            allowedValues.Add("UNKNOWN");
+            allowedValues.Add("NOT_IMPLEMENTED");
             action.AddOutputParameter(new ParameterString("WriteStatus", allowedValues));
+            allowedValues.Clear();
             iDelegateGetMediaInfo = new ActionDelegate(DoGetMediaInfo);
             EnableAction(action, iDelegateGetMediaInfo, GCHandle.ToIntPtr(iGch));
         }
@@ -160,6 +166,11 @@ namespace OpenHome.Net.Device.Providers
             action.AddInputParameter(new ParameterUint("InstanceID"));
             allowedValues.Add("STOPPED");
             allowedValues.Add("PLAYING");
+            allowedValues.Add("TRANSITIONING");
+            allowedValues.Add("PAUSED_PLAYBACK");
+            allowedValues.Add("PAUSED_RECORDING");
+            allowedValues.Add("RECORDING");
+            allowedValues.Add("NO_MEDIA_PRESENT");
             action.AddOutputParameter(new ParameterString("CurrentTransportState", allowedValues));
             allowedValues.Clear();
             allowedValues.Add("OK");
@@ -183,7 +194,7 @@ namespace OpenHome.Net.Device.Providers
             OpenHome.Net.Core.Action action = new OpenHome.Net.Core.Action("GetPositionInfo");
             List<String> allowedValues = new List<String>();
             action.AddInputParameter(new ParameterUint("InstanceID"));
-            action.AddOutputParameter(new ParameterUint("Track", 0, 0, 1));
+            action.AddOutputParameter(new ParameterUint("Track", 0, 2147483647, 1));
             action.AddOutputParameter(new ParameterString("TrackDuration", allowedValues));
             action.AddOutputParameter(new ParameterString("TrackMetaData", allowedValues));
             action.AddOutputParameter(new ParameterString("TrackURI", allowedValues));
@@ -297,6 +308,13 @@ namespace OpenHome.Net.Device.Providers
             List<String> allowedValues = new List<String>();
             action.AddInputParameter(new ParameterUint("InstanceID"));
             allowedValues.Add("TRACK_NR");
+            allowedValues.Add("ABS_TIME");
+            allowedValues.Add("REL_TIME");
+            allowedValues.Add("ABS_COUNT");
+            allowedValues.Add("REL_COUNT");
+            allowedValues.Add("CHANNEL_FREQ");
+            allowedValues.Add("TAPE-INDEX");
+            allowedValues.Add("FRAME");
             action.AddInputParameter(new ParameterString("Unit", allowedValues));
             allowedValues.Clear();
             action.AddInputParameter(new ParameterString("Target", allowedValues));
